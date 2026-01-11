@@ -1,1 +1,2 @@
+#!/bin/bash
 tasklist | grep -E "nginx|php|mysqld"

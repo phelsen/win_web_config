@@ -1,1 +1,2 @@
+#!/bin/bash
 /c/Workdir/MyApps/web/php/php-8.3.29-Win32-vs16-x64/php-cgi.exe -b 127.0.0.1:9083 -n -c /c/Workdir/MyApps/web/php/php-8.3.29-Win32-vs16-x64/php.ini
