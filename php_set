@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# 1. Variables and Inputs
+VERSION=$1
+CURRENT_DIR=$(basename "$PWD")
+NGINX_PATH="/c/Workdir/MyApps/web/nginx-1.29.4"
+NGINX_EXE="${NGINX_PATH}/nginx.exe"
+
+# 2. File Paths
+SRC_FILE="${NGINX_PATH}/conf/sites-available/${CURRENT_DIR}.${VERSION}"
+DEST_FILE="${NGINX_PATH}/conf/sites-enabled/${CURRENT_DIR}.test.conf"
+
+echo "--- PHP Version Switcher ---"
+echo "Project: $CURRENT_DIR"
+echo "Target PHP: $VERSION"
+
+# 3. Copy the configuration file
+if [ -f "$SRC_FILE" ]; then
+    cp -f "$SRC_FILE" "$DEST_FILE"
+    echo "✓ Config copied: ${CURRENT_DIR}.${VERSION} -> ${CURRENT_DIR}.test.conf"
+else
+    echo "✗ Error: Source file $SRC_FILE not found."
+    exit 1
+fi
+
+# 4. Handle Nginx (Start or Reload)
+# Check if nginx is already running using tasklist
+if tasklist //fi "imagename eq nginx.exe" | grep -q "nginx.exe"; then
+    echo "↻ Nginx is running. Reloading configuration..."
+    "$NGINX_EXE" -p "$NGINX_PATH" -s reload
+else
+    echo "▶ Nginx is not running. Starting Nginx..."
+    # Starting nginx in a way that doesn't hang the terminal
+    start "" "$NGINX_EXE" -p "$NGINX_PATH"
+fi
+# 5. Update the PHP executable link
+PHP_SYMLINK="/c/Workdir/bin/php"
+TARGET_PHP="/c/Workdir/bin/php${VERSION}"
+
+if [ -f "$TARGET_PHP" ]; then
+    # Remove existing link/file and create a new hard link or copy
+    rm -f "$PHP_SYMLINK"
+    ln -s "$TARGET_PHP" "$PHP_SYMLINK"
+    echo "✓ PHP alias updated to version $VERSION"
+else
+    echo "⚠ Warning: $TARGET_PHP not found. PHP command not updated."
+fi
+
+echo "--- Switch Complete ---"
+
+
