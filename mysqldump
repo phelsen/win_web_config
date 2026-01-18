@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+"/c/Workdir/MyApps/mysql/bin/mysqldump.exe" "$@"
